@@ -1,0 +1,39 @@
+name: Publish MkDocs
+
+on:
+  push:
+    branches:
+      - main
+
+# This is necessary for the gh-deploy command to push to the gh-pages branch.
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    name: Deploy MkDocs Site
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure Git User
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install poetry
+          poetry install --no-interaction --no-root
+
+      - name: Deploy to GitHub Pages
+        run: poetry run mkdocs gh-deploy --force
+
